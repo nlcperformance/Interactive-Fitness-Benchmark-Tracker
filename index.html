@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Athletic Performance Benchmark Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb;
+        }
+        .rank-gold { background-color: #fcd34d; color: #92400e; font-weight: 700; }
+        .rank-silver { background-color: #d1d5db; color: #4b5563; font-weight: 700; }
+        .rank-bronze { background-color: #fecaca; color: #991b1b; font-weight: 700; }
+        .rank-none { background-color: #e5e7eb; color: #6b7280; }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        .header-bg {
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <!-- Main Title and Intro -->
+        <header class="header-bg text-white p-6 rounded-xl shadow-2xl mb-8">
+            <h1 class="text-3xl font-extrabold mb-1">Elite Operator Fitness Benchmarks</h1>
+            <p class="text-sm opacity-80">Interactive Player Test Sheet based on DJ Shipley Standard & England U18 Correlation.</p>
+        </header>
+
+        <!-- Player Test Sheet Table -->
+        <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-indigo-500 pb-2">📊 Player Test Sheet</h2>
+        <div class="overflow-x-auto bg-white rounded-xl shadow-lg p-4">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Test</th>
+                        <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">The Standard</th>
+                        <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Elite</th>
+                        <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Be A Pro</th>
+                        <th class="px-3 py-3 text-center text-xs font-bold text-indigo-600 uppercase tracking-wider">Player Result</th>
+                        <th class="px-3 py-3 text-center text-xs font-bold text-gray-800 uppercase tracking-wider">Rank</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200" id="test-results-body">
+                    <!-- Data will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Ranking Key -->
+        <div class="mt-6 p-4 bg-indigo-50 rounded-xl shadow-md">
+            <h3 class="text-lg font-semibold text-indigo-700 mb-2">Ranking Key</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                <div class="p-2 rank-gold rounded-lg shadow-inner text-center">Gold / Be A Pro: Above Pathway Desirable</div>
+                <div class="p-2 rank-silver rounded-lg shadow-inner text-center">Silver / Elite: Within Pathway Target</div>
+                <div class="p-2 rank-bronze rounded-lg shadow-inner text-center">Bronze / Achievable: Below Standard</div>
+            </div>
+        </div>
+
+        <!-- Full Benchmarks Reference -->
+        <div class="mt-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-indigo-500 pb-2">📋 Full Benchmark Reference</h2>
+            <div id="benchmarks-reference" class="space-y-6">
+                <!-- Data will be populated by JavaScript -->
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Set up the standards data structure
+        const BENCHMARKS = [
+            { id: 'broadJump', name: 'Broad Jump', unit: 'm', description: 'Explosive Power (Standing jump)', standard: 1.8, elite: 2.0, pro: 2.3, compare: 'GTE', note: 'Be A Pro level jump correlates with desirable lower-body strength and force expression.', pathway: 'Pathway is tracked through movement competency ("Hop & Stick 1 m Control /4 score") and lower-body strength (1.4–1.6 × BW squat).' },
+            { id: 'trapBarDL', name: 'Trap Bar DL', unit: '× BW', description: 'Full-Body Strength (5 clean reps)', standard: 1.5, elite: 1.75, pro: 2.0, compare: 'GTE', note: 'The U18 “Desirable” pathway is equivalent to the Be A Pro standard.', pathway: 'Achievable (Backs): 1.6 × BW | Desirable (Backs): 1.85 × BW | Achievable (Forwards): 1.25–1.5 × BW | Desirable (Forwards): 1.75–2.0 × BW' },
+            { id: 'pullUps', name: 'Pull-Ups', unit: 'Reps', description: 'Upper-Body Strength (Pronated grip, max reps)', standard: 10, elite: 15, pro: 20, compare: 'GTE', note: 'Be A Pro standard (20 reps) would be considered exceptional.', pathway: 'Chin-Up Reps (Female U18) Achievable: 1 Rep | Desirable: 3–6 Reps' },
+            { id: 'farmersCarry', name: 'Farmer’s Carry', unit: 'm', description: 'Grip, Core & Posture (Carry BW total load)', standard: 53, elite: 69, pro: 76, compare: 'GTE', note: 'Great field test of functional strength and resilience.', pathway: 'No direct standard, but closely linked to core and posterior-chain strength benchmarks (e.g. Hamstring Bridge 30 reps Gold).' },
+            { id: 'benchPressBW', name: 'Bench Press (BW)', unit: 'Reps', description: 'Upper-Body Power & Endurance (Max reps @ BW)', standard: 10, elite: 15, pro: 20, compare: 'GTE', note: 'U18 Desirable (1.0 × BW 1RM) aligns with the Elite strength standard.', pathway: '1RM Bench Achievable: 0.6 × BW | Desirable: 1.0 × BW' },
+            { id: 'plank', name: 'Plank', unit: 'min:sec', description: 'Core Control & Stability (Hold until failure)', standard: 120, elite: 150, pro: 180, compare: 'GTE', timeFormat: true, note: 'U18 Gold (120 s) equals the Elite level standard.', pathway: 'Front Plank (s) Bronze: 60 s | Silver: 90 s | Gold: 120 s' },
+            { id: 'run800m', name: '800 m Run', unit: 'min:sec', description: 'Anaerobic Endurance (Timed effort)', standard: 195, elite: 180, pro: 165, compare: 'LTE', timeFormat: true, note: 'Direct alignment — U18 Desirable ≈ Be A Pro threshold.', pathway: '1200 m Run Achievable (Backs): 5:45 min (~3:05/800m) | Desirable (Backs): 5:15 min (~2:50/800m)' },
+        ];
+
+        // --- Utility Functions ---
+
+        /**
+         * Converts time string (M:SS or MM:SS) to total seconds.
+         * Returns 0 for invalid format.
+         * @param {string} timeStr - Time in "M:SS" format (e.g., "2:30").
+         * @returns {number} Total seconds.
+         */
+        function timeToSeconds(timeStr) {
+            if (!timeStr) return 0;
+            const parts = timeStr.split(':').map(p => parseInt(p.trim()) || 0);
+            if (parts.length === 2) {
+                // M:SS or MM:SS
+                return parts[0] * 60 + parts[1];
+            }
+            // Fallback for single number entry (assumed seconds)
+            return parseFloat(timeStr) || 0;
+        }
+
+        /**
+         * Formats seconds back into MM:SS string.
+         * @param {number} totalSeconds
+         * @returns {string}
+         */
+        function secondsToTime(totalSeconds) {
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = Math.floor(totalSeconds % 60);
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        /**
+         * Determines the rank (Bronze, Silver, Gold, or None) based on the result.
+         * @param {string} testId - The ID of the test.
+         * @param {string} resultStr - The player's raw input result.
+         */
+        function calculateRank(testId, resultStr) {
+            const test = BENCHMARKS.find(b => b.id === testId);
+            if (!test) return { rank: 'None', text: 'Error' };
+
+            let resultValue;
+
+            // Handle time-based results (Plank, 800m)
+            if (test.timeFormat) {
+                resultValue = timeToSeconds(resultStr);
+            } else {
+                resultValue = parseFloat(resultStr);
+            }
+
+            if (isNaN(resultValue) || resultValue <= 0) {
+                return { rank: 'None', text: 'Enter Result' };
+            }
+
+            const { standard, elite, pro, compare } = test;
+
+            // Compare Greater Than or Equal To (GTE): DL, Pull-Ups, Bench, Carry, Plank
+            if (compare === 'GTE') {
+                if (resultValue >= pro) {
+                    return { rank: 'Gold', text: 'Be A Pro' };
+                } else if (resultValue >= elite) {
+                    return { rank: 'Silver', text: 'Elite' };
+                } else if (resultValue >= standard) {
+                    return { rank: 'Silver', text: 'The Standard' }; // Standard is also "Within Pathway Target" (Silver)
+                } else {
+                    return { rank: 'Bronze', text: 'Below Standard' };
+                }
+            }
+            // Compare Less Than or Equal To (LTE): 800m Run (Time)
+            else if (compare === 'LTE') {
+                if (resultValue <= pro) {
+                    return { rank: 'Gold', text: 'Be A Pro' };
+                } else if (resultValue <= elite) {
+                    return { rank: 'Silver', text: 'Elite' };
+                } else if (resultValue <= standard) {
+                    return { rank: 'Silver', text: 'The Standard' }; // Standard is also "Within Pathway Target" (Silver)
+                } else {
+                    return { rank: 'Bronze', text: 'Below Standard' };
+                }
+            }
+
+            return { rank: 'None', text: 'Enter Result' };
+        }
+
+        // --- DOM Generation and Event Handlers ---
+
+        function formatBenchmarkValue(test, value) {
+            if (test.timeFormat) {
+                return secondsToTime(value);
+            }
+            return value;
+        }
+
+        function createPathwayHtml(pathwayStr) {
+            if (!pathwayStr) return '';
+            
+            const parts = pathwayStr.split(' | ');
+            let html = '<div class="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">';
+            html += '<h4 class="text-sm font-semibold text-gray-700 mb-1">England U18 Pathway Standard:</h4>';
+            html += '<ul class="list-disc list-inside text-xs text-gray-600 space-y-1">';
+            
+            parts.forEach(part => {
+                html += `<li>${part}</li>`;
+            });
+
+            html += '</ul></div>';
+            return html;
+        }
+
+        function createTestTable() {
+            const tbody = document.getElementById('test-results-body');
+            const refDiv = document.getElementById('benchmarks-reference');
+            tbody.innerHTML = '';
+            refDiv.innerHTML = '';
+
+            BENCHMARKS.forEach(test => {
+                // --- 1. Create Table Row for Interactive Tracker ---
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+
+                // Test Name
+                row.innerHTML += `<td class="px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900">${test.name} (${test.unit})</td>`;
+
+                // Standards (Hidden on small screens)
+                row.innerHTML += `<td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">${formatBenchmarkValue(test, test.standard)}</td>`;
+                row.innerHTML += `<td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">${formatBenchmarkValue(test, test.elite)}</td>`;
+                row.innerHTML += `<td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">${test.compare === 'LTE' ? '< ' : ''}${formatBenchmarkValue(test, test.pro)}${test.compare === 'GTE' ? ' +' : ''}</td>`;
+
+
+                // Player Result Input
+                let inputType = test.timeFormat ? 'text' : 'number';
+                let inputStep = test.unit.includes('BW') || test.unit.includes('m') ? '0.05' : (test.unit === 'ft' ? '1' : '1');
+                let inputPlaceholder = test.timeFormat ? 'M:SS (e.g., 2:30)' : `e.g., ${formatBenchmarkValue(test, test.standard)}`;
+                let inputClass = test.timeFormat ? 'w-28' : 'w-20';
+                
+                const inputCell = document.createElement('td');
+                inputCell.className = 'px-3 py-3 whitespace-nowrap text-center';
+                inputCell.innerHTML = `
+                    <input type="${inputType}" id="result-${test.id}" placeholder="${inputPlaceholder}" step="${inputStep}"
+                           class="border border-gray-300 rounded-md p-2 text-sm text-center ${inputClass} focus:ring-indigo-500 focus:border-indigo-500"
+                           style="${inputType === 'number' ? 'appearance: textfield;' : ''}">
+                `;
+                row.appendChild(inputCell);
+
+                // Rank Display
+                const rankCell = document.createElement('td');
+                rankCell.id = `rank-${test.id}`;
+                rankCell.className = 'px-3 py-3 whitespace-nowrap text-xs rounded-lg text-center font-semibold rank-none';
+                rankCell.textContent = 'Ready';
+                row.appendChild(rankCell);
+
+                tbody.appendChild(row);
+
+                // Add event listener to input
+                const inputElement = document.getElementById(`result-${test.id}`);
+                inputElement.addEventListener('input', (e) => updateRank(test.id, e.target.value));
+                
+                // --- 2. Create Reference Blocks ---
+                const refBlock = document.createElement('div');
+                refBlock.className = 'p-5 bg-white rounded-xl shadow-md border-t-4 border-indigo-500';
+                refBlock.innerHTML = `
+                    <div class="flex items-center space-x-3 mb-3">
+                        <span class="text-2xl font-extrabold text-indigo-600">${test.name}</span>
+                        <span class="text-sm text-gray-500">(${test.description})</span>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-4 mb-3 text-sm">
+                        <div class="p-2 border border-gray-200 rounded-lg"><strong>The Standard:</strong> ${formatBenchmarkValue(test, test.standard)} ${test.unit}</div>
+                        <div class="p-2 border border-gray-200 rounded-lg"><strong>Elite:</strong> ${formatBenchmarkValue(test, test.elite)} ${test.unit}</div>
+                        <div class="p-2 border border-gray-200 rounded-lg"><strong>Be A Pro:</strong> ${test.compare === 'LTE' ? '< ' : ''}${formatBenchmarkValue(test, test.pro)} ${test.unit}</div>
+                    </div>
+                    ${createPathwayHtml(test.pathway)}
+                    <p class="text-xs text-gray-500 italic mt-2"><strong>Notes:</strong> ${test.note}</p>
+                `;
+                refDiv.appendChild(refBlock);
+
+            });
+        }
+
+        /**
+         * Updates the rank display for a specific test.
+         * @param {string} testId - The ID of the test.
+         * @param {string} resultStr - The player's raw input result.
+         */
+        function updateRank(testId, resultStr) {
+            const rankResult = calculateRank(testId, resultStr);
+            const rankCell = document.getElementById(`rank-${testId}`);
+
+            // Reset classes
+            rankCell.className = `px-3 py-3 whitespace-nowrap text-xs rounded-lg text-center font-semibold`;
+            
+            if (rankResult.rank !== 'None') {
+                rankCell.classList.add(`rank-${rankResult.rank.toLowerCase()}`);
+                rankCell.textContent = `${rankResult.rank} (${rankResult.text})`;
+            } else {
+                rankCell.classList.add('rank-none');
+                rankCell.textContent = 'Enter Result';
+            }
+        }
+
+        // Initialize the app on load
+        document.addEventListener('DOMContentLoaded', createTestTable);
+    </script>
+</body>
+</html>
