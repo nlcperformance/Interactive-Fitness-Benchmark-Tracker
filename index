@@ -4,17 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Athletic Performance Benchmark Tracker</title>
+    <!-- Use Tailwind CDN for zero build steps (ideal for GitHub Pages/Google Sites) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Embed all custom CSS for zero external files */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f7f9fb;
         }
+        /* Rank Styles optimized for clear contrast */
         .rank-gold { background-color: #fcd34d; color: #92400e; font-weight: 700; }
         .rank-silver { background-color: #d1d5db; color: #4b5563; font-weight: 700; }
         .rank-bronze { background-color: #fecaca; color: #991b1b; font-weight: 700; }
         .rank-none { background-color: #e5e7eb; color: #6b7280; }
+        /* Remove default number input spinners for cleaner UI */
         input[type="number"]::-webkit-outer-spin-button,
         input[type="number"]::-webkit-inner-spin-button {
             -webkit-appearance: none;
@@ -77,6 +81,11 @@
 
     </div>
 
+    <!-- Footer/Credit Line -->
+    <footer class="max-w-4xl mx-auto mt-8 pt-4 border-t border-gray-200 text-center text-xs text-gray-500">
+        Created by nlcperformance
+    </footer>
+
     <script>
         // Set up the standards data structure
         const BENCHMARKS = [
@@ -86,7 +95,13 @@
             { id: 'farmersCarry', name: 'Farmer’s Carry', unit: 'm', description: 'Grip, Core & Posture (Carry BW total load)', standard: 53, elite: 69, pro: 76, compare: 'GTE', note: 'Great field test of functional strength and resilience.', pathway: 'No direct standard, but closely linked to core and posterior-chain strength benchmarks (e.g. Hamstring Bridge 30 reps Gold).' },
             { id: 'benchPressBW', name: 'Bench Press (BW)', unit: 'Reps', description: 'Upper-Body Power & Endurance (Max reps @ BW)', standard: 10, elite: 15, pro: 20, compare: 'GTE', note: 'U18 Desirable (1.0 × BW 1RM) aligns with the Elite strength standard.', pathway: '1RM Bench Achievable: 0.6 × BW | Desirable: 1.0 × BW' },
             { id: 'plank', name: 'Plank', unit: 'min:sec', description: 'Core Control & Stability (Hold until failure)', standard: 120, elite: 150, pro: 180, compare: 'GTE', timeFormat: true, note: 'U18 Gold (120 s) equals the Elite level standard.', pathway: 'Front Plank (s) Bronze: 60 s | Silver: 90 s | Gold: 120 s' },
-            { id: 'run800m', name: '800 m Run', unit: 'min:sec', description: 'Anaerobic Endurance (Timed effort)', standard: 195, elite: 180, pro: 165, compare: 'LTE', timeFormat: true, note: 'Direct alignment — U18 Desirable ≈ Be A Pro threshold.', pathway: '1200 m Run Achievable (Backs): 5:45 min (~3:05/800m) | Desirable (Backs): 5:15 min (~2:50/800m)' },
+            
+            // 800m Run - Backs (Original Standards)
+            { id: 'run800mBacks', name: '800 m Run (Backs)', unit: 'min:sec', description: 'Anaerobic Endurance (Timed effort for Backs)', standard: 195, elite: 180, pro: 165, compare: 'LTE', timeFormat: true, note: 'Direct alignment — U18 Desirable ≈ Be A Pro threshold for Backs.', pathway: '1200 m Run Achievable (Backs): 5:45 min (~3:05/800m) | Desirable (Backs): 5:15 min (~2:50/800m)' },
+            
+            // 800m Run - Forwards (Original Standards + 30 seconds)
+            // Standards: 3:45 (225s), 3:30 (210s), 3:15 (195s)
+            { id: 'run800mForwards', name: '800 m Run (Forwards)', unit: 'min:sec', description: 'Anaerobic Endurance (Timed effort for Forwards)', standard: 225, elite: 210, pro: 195, compare: 'LTE', timeFormat: true, note: 'Standards are adjusted +30 seconds relative to Backs, aligning with positional demands.', pathway: 'Based on Backs standards +30s. Approximate U18 Desirable equivalent: 3:15 min per 800m.' },
         ];
 
         // --- Utility Functions ---
@@ -99,10 +114,12 @@
          */
         function timeToSeconds(timeStr) {
             if (!timeStr) return 0;
-            const parts = timeStr.split(':').map(p => parseInt(p.trim()) || 0);
-            if (parts.length === 2) {
-                // M:SS or MM:SS
-                return parts[0] * 60 + parts[1];
+            // Use regex to robustly parse M:SS or MM:SS format
+            const match = timeStr.match(/^(\d+):(\d{2})$/);
+            if (match) {
+                const minutes = parseInt(match[1], 10);
+                const seconds = parseInt(match[2], 10);
+                return minutes * 60 + seconds;
             }
             // Fallback for single number entry (assumed seconds)
             return parseFloat(timeStr) || 0;
@@ -132,6 +149,7 @@
 
             // Handle time-based results (Plank, 800m)
             if (test.timeFormat) {
+                // Use robust time parser
                 resultValue = timeToSeconds(resultStr);
             } else {
                 resultValue = parseFloat(resultStr);
@@ -218,12 +236,14 @@
 
                 // Player Result Input
                 let inputType = test.timeFormat ? 'text' : 'number';
-                let inputStep = test.unit.includes('BW') || test.unit.includes('m') ? '0.05' : (test.unit === 'ft' ? '1' : '1');
+                // Adjusted step/placeholder for clarity and ease of use
+                let inputStep = test.unit.includes('BW') ? '0.05' : '1';
                 let inputPlaceholder = test.timeFormat ? 'M:SS (e.g., 2:30)' : `e.g., ${formatBenchmarkValue(test, test.standard)}`;
                 let inputClass = test.timeFormat ? 'w-28' : 'w-20';
                 
                 const inputCell = document.createElement('td');
                 inputCell.className = 'px-3 py-3 whitespace-nowrap text-center';
+                // Using an arrow function in addEventListener directly for cleaner DOM manipulation
                 inputCell.innerHTML = `
                     <input type="${inputType}" id="result-${test.id}" placeholder="${inputPlaceholder}" step="${inputStep}"
                            class="border border-gray-300 rounded-md p-2 text-sm text-center ${inputClass} focus:ring-indigo-500 focus:border-indigo-500"
@@ -240,7 +260,7 @@
 
                 tbody.appendChild(row);
 
-                // Add event listener to input
+                // Add event listener to input directly in the loop
                 const inputElement = document.getElementById(`result-${test.id}`);
                 inputElement.addEventListener('input', (e) => updateRank(test.id, e.target.value));
                 
@@ -287,7 +307,8 @@
             }
         }
 
-        // Initialize the app on load
+        // Initialize the app on load using the standard practice for static HTML
+        // This ensures the DOM is fully loaded before trying to access elements.
         document.addEventListener('DOMContentLoaded', createTestTable);
     </script>
 </body>
