@@ -95,7 +95,13 @@
             { id: 'farmersCarry', name: 'Farmer’s Carry', unit: 'm', description: 'Grip, Core & Posture (Carry BW total load)', standard: 53, elite: 69, pro: 76, compare: 'GTE', note: 'Great field test of functional strength and resilience.', pathway: 'No direct standard, but closely linked to core and posterior-chain strength benchmarks (e.g. Hamstring Bridge 30 reps Gold).' },
             { id: 'benchPressBW', name: 'Bench Press (BW)', unit: 'Reps', description: 'Upper-Body Power & Endurance (Max reps @ BW)', standard: 10, elite: 15, pro: 20, compare: 'GTE', note: 'U18 Desirable (1.0 × BW 1RM) aligns with the Elite strength standard.', pathway: '1RM Bench Achievable: 0.6 × BW | Desirable: 1.0 × BW' },
             { id: 'plank', name: 'Plank', unit: 'min:sec', description: 'Core Control & Stability (Hold until failure)', standard: 120, elite: 150, pro: 180, compare: 'GTE', timeFormat: true, note: 'U18 Gold (120 s) equals the Elite level standard.', pathway: 'Front Plank (s) Bronze: 60 s | Silver: 90 s | Gold: 120 s' },
-            { id: 'run800m', name: '800 m Run', unit: 'min:sec', description: 'Anaerobic Endurance (Timed effort)', standard: 195, elite: 180, pro: 165, compare: 'LTE', timeFormat: true, note: 'Direct alignment — U18 Desirable ≈ Be A Pro threshold.', pathway: '1200 m Run Achievable (Backs): 5:45 min (~3:05/800m) | Desirable (Backs): 5:15 min (~2:50/800m)' },
+            
+            // 800m Run - Backs (Original Standards)
+            { id: 'run800mBacks', name: '800 m Run (Backs)', unit: 'min:sec', description: 'Anaerobic Endurance (Timed effort for Backs)', standard: 195, elite: 180, pro: 165, compare: 'LTE', timeFormat: true, note: 'Direct alignment — U18 Desirable ≈ Be A Pro threshold for Backs.', pathway: '1200 m Run Achievable (Backs): 5:45 min (~3:05/800m) | Desirable (Backs): 5:15 min (~2:50/800m)' },
+            
+            // 800m Run - Forwards (Original Standards + 30 seconds)
+            // Standards: 3:45 (225s), 3:30 (210s), 3:15 (195s)
+            { id: 'run800mForwards', name: '800 m Run (Forwards)', unit: 'min:sec', description: 'Anaerobic Endurance (Timed effort for Forwards)', standard: 225, elite: 210, pro: 195, compare: 'LTE', timeFormat: true, note: 'Standards are adjusted +30 seconds relative to Backs, aligning with positional demands.', pathway: 'Based on Backs standards +30s. Approximate U18 Desirable equivalent: 3:15 min per 800m.' },
         ];
 
         // --- Utility Functions ---
